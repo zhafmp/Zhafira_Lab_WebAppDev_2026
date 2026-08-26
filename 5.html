@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Document</title>
+        <style>
+            body {
+                font-family: system-ui, sans-serif;
+                text-align: center;
+                margin-top: 40px;
+                color: #000000
+            }
+            .kartu {
+                border: 1px solid #cbd5e1;
+                border-radius: 10px;
+                padding: 20px;
+                max-width: 320px;
+            }
+
+            button {
+                margin-top: 10px;
+                padding: 8px 14px;
+                border: none;
+                border-radius: 6px;
+                background: #2563eb;
+                color: white;
+                cursor: pointer;
+            }
+
+            button:hover {background: #1d4ed8}
+
+            h1 {
+                color: #2563eb
+            }
+        </style>
+    </head>
+    <body>
+        <h1 id="judul">Hello, World!</h1>
+        <p>Buka console untuk melihat pesan tambahan JavaScript.</p>
+        <div class="kartu">
+            <h2 id="judul kartu">Judul Awal</h2>
+            <p class="deskripsi">Deskripsi awal yang akan diganti</p>
+            <button id="btn-ubah">Ubah Konten</button>
+        </div>
+
+        <script>
+            const nilaiUjian = [70, 45, 88, 92, 55, 100];
+            // filter: ambil yang lulus (>= 60)
+            const lulus = nilaiUjian.filter((n) => n >= 60);
+            console.log("Lulus:", lulus);
+            // map: tambahkan nilai bonus 5 poin untuk semua peserta
+            const nilaiBonus = nilaiUjian.map((n) => n + 5);
+            console.log("Setelah bonus:", nilaiBonus);
+            // reduce: hitung total lalu rata-rata
+            const total = nilaiUjian.reduce((jumlah, n) => jumlah + n, 0);
+            const rataRata = total / nilaiUjian.length;
+            console.log(`Total: ${total}, Rata-rata: ${rataRata.toFixed(2)}`);
+            // method-method ini bisa dirangkai (chaining)
+            const rataRataLulus = nilaiUjian
+            .filter((n) => n >= 60)
+            .reduce((a, b) => a + b, 0) / lulus.length;
+            console.log(`Rata-rata yang lulus: ${rataRataLulus.toFixed(2)}`);
+        </script>
+     </body>
+</html>
