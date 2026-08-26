@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Document</title>
+        <style>
+            body {
+                font-family: system-ui, sans-serif;
+                text-align: center;
+                margin-top: 40px;
+                color: #000000
+            }
+            h1 {
+                color: #2563eb
+            }
+        </style>
+    </head>
+    <body>
+        <h1 id="judul">Hello, World!</h1>
+        <p>Buka console untuk melihat pesan tambahan JavaScript.</p>
+
+        <script>
+            const harga = 150000;
+            const diskonPersen = 20;
+            const potongan = harga * (diskonPersen / 100);
+            const hargaAkhir = harga - potongan;
+            console.log(`Harga awal: Rp${harga}`);
+            console.log(`Diskon ${diskonPersen}% = Rp${potongan}`);
+            console.log(`Harga akhir: Rp${hargaAkhir}`);
+            const status = hargaAkhir < 100000 ? "Murah" : "Mahal";
+        </script>
+    </body>
+</html>
