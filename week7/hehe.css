@@ -1,0 +1,41 @@
+* {
+    margin: 0;
+    padding: 0;
+    font-family: arial, sans-serif;
+}
+
+body {
+    background-color: rgb(255, 244, 228);
+    color: #88bbe5;
+}
+
+header {
+    background-color: #88bbe5;
+    color: rgb(255, 244, 228);
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    align-content: center;
+}
+
+header h1 {
+    font-size: 28px;
+    font-weight: bold;
+}
+
+header p {
+    font-size: 12px;
+    font-weight: underline;
+}
+
+main {
+    margin: 0 auto;
+    padding: 24px;
+}
+
+.card {
+    background-color: rgb(255, 244, 228);
+    color: #535252;
+    border-radius: 12%;
+    border: 1px;
+}
