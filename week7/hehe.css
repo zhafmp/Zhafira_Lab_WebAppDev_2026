@@ -43,7 +43,7 @@ main {
 .product-grid {
     display: grid;
     gap: 16px;
-    grid-template-columns: auto;
+    grid-template-columns: 16px;
 }
 
 .product-card {
@@ -53,4 +53,11 @@ main {
     border: 1px;
     border-radius: 12px;
     position: relative;
+}
+
+.code {
+    position: absolute;
+    top: 16px;
+    font-weight: 300;
+    color: #535252
 }
