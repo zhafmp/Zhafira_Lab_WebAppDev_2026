@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis Interaktif Software Project Management</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col justify-between font-sans">
+
+    <!-- Header -->
+    <header class="bg-slate-800 border-b border-slate-700 py-4 px-6 shadow-md">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold tracking-wide text-indigo-400">Software Project Management Quiz</h1>
+            <div id="score-badge" class="hidden bg-indigo-600/30 border border-indigo-500 text-indigo-300 px-3 py-1 rounded-full text-sm font-medium">
+                Skor: <span id="current-score">0</span>/<span id="total-score">50</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-3xl mx-auto px-4 py-8 flex-grow w-full">
+        
+        <!-- Welcome Screen -->
+        <div id="welcome-screen" class="bg-slate-800 border border-slate-700 rounded-2xl p-8 shadow-xl text-center space-y-6">
+            <div class="inline-block p-4 bg-indigo-500/10 rounded-full text-indigo-400 mb-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012-2m-6 9l2 2 4-4" />
+                </svg>
+            </div>
+            <h2 class="text-3xl font-extrabold text-white">Uji Pemahaman Materi SPM</h2>
+            <p class="text-slate-300 text-base max-w-xl mx-auto">
+                Kuis komprehensif berisi <span class="font-semibold text-indigo-400">50 pertanyaan</span> yang mencakup seluruh materi kuliah (Week 1 s.d. Week 7: Fundamental, Principles, Knowledge Areas, Predictive, Agile, WBS, Schedule, & Cost Management).
+            </p>
+            <div class="pt-4">
+                <button onclick="startQuiz()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-8 py-3.5 rounded-xl shadow-lg transition-all duration-200 transform hover:-translate-y-0.5 cursor-pointer">
+                    Mulai Kuis Sekarang
+                </button>
+            </div>
+        </div>
+
+        <!-- Quiz Screen -->
+        <div id="quiz-screen" class="hidden space-y-6">
+            <!-- Progress Bar & Info -->
+            <div class="flex justify-between items-center text-sm text-slate-400 font-medium px-1">
+                <span>Soal <span id="question-number" class="text-white font-bold">1</span> dari 50</span>
+                <span id="question-category" class="bg-slate-800 border border-slate-700 px-3 py-1 rounded-lg text-indigo-300 text-xs uppercase tracking-wider">Kategori</span>
+            </div>
+            <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden border border-slate-700/50">
+                <div id="progress-bar" class="bg-indigo-500 h-full w-0 transition-all duration-300"></div>
+            </div>
+
+            <!-- Question Card -->
+            <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 sm:p-8 shadow-xl space-y-6">
+                <h3 id="question-text" class="text-xl sm:text-2xl font-semibold text-white leading-relaxed">
+                    Pertanyaan akan muncul di sini...
+                </h3>
+
+                <!-- Options List -->
+                <div id="options-container" class="space-y-3">
+                    <!-- Dinamik generate opsi -->
+                </div>
+
+                <!-- Rationale Box (Hidden by default) -->
+                <div id="explanation-box" class="hidden mt-6 p-4 rounded-xl border border-slate-700 bg-slate-900/60 space-y-2">
+                    <h4 id="explanation-title" class="font-bold text-sm tracking-wide uppercase">Pembahasan</h4>
+                    <p id="explanation-text" class="text-sm text-slate-300 leading-relaxed"></p>
+                </div>
+
+                <!-- Action Button -->
+                <div class="pt-4 flex justify-end">
+                    <button id="next-btn" onclick="nextQuestion()" class="hidden bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-6 py-2.5 rounded-xl shadow-md transition-all duration-200 cursor-pointer">
+                        Selanjutnya
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Result Screen -->
+        <div id="result-screen" class="hidden bg-slate-800 border border-slate-700 rounded-2xl p-8 shadow-xl text-center space-y-6">
+            <div class="inline-block p-4 bg-indigo-500/10 rounded-full text-indigo-400 mb-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                </svg>
+            </div>
+            <h2 class="text-3xl font-bold text-white">Kuis Selesai!</h2>
+            <p class="text-slate-300 text-base">
+                Terima kasih telah menyelesaikan kuis latihan Software Project Management. Berikut adalah hasil akhir Anda:
+            </p>
+            <div class="py-4">
+                <div class="text-5xl font-extrabold text-indigo-400 mb-2"><span id="final-score">0</span> <span class="text-2xl text-slate-400">/ 50</span></div>
+                <p id="result-message" class="text-slate-300 font-medium text-lg"></p>
+            </div>
+            <div class="pt-4">
+                <button onclick="restartQuiz()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-8 py-3.5 rounded-xl shadow-lg transition-all duration-200 cursor-pointer">
+                    Ulangi Kuis
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-800 border-t border-slate-700 py-4 text-center text-xs text-slate-400">
+        <p>Software Project Management Interactive Learning Assistant &bull; Universitas Prasetiya Mulya</p>
+    </footer>
+
+    <!-- Script Kuis -->
+    <script>
+        const quizData = [
+            {
+                question: "Manakah di bawah ini yang paling akurat mendefinisikan sebuah 'proyek' menurut prinsip manajemen proyek?",
+                category: "Week 1: Fundamentals",
+                options: [
+                    { text: "Aktivitas rutin harian yang berulang untuk menjaga kelangsungan bisnis.", isCorrect: false, rationale: "Aktivitas rutin berulang adalah definisi dari operasi, bukan proyek." },
+                    { text: "Usaha sementara yang dilakukan untuk menghasilkan produk, layanan, atau hasil yang unik.", isCorrect: true, rationale: "Proyek bersifat sementara (temporary) dan menghasilkan sesuatu yang unik." },
+                    { text: "Sistem yang berjalan otomatis tanpa batasan waktu tertentu.", isCorrect: false, rationale: "Proyek wajib memiliki batasan awal dan akhir yang jelas." },
+                    { text: "Kumpulan tugas tanpa tujuan strategis organisasi yang jelas.", isCorrect: false, rationale: "Setiap proyek harus memiliki nilai strategis dan tujuan pencapaian yang terukur." }
+                ],
+                hint: "Perhatikan karakteristik utama proyek: temporary dan unique."
+            },
+            {
+                question: "Apa perbedaan paling mendasar antara 'Project' dan 'Operations'?",
+                category: "Week 1: Fundamentals",
+                options: [
+                    { text: "Proyek bersifat permanen, sedangkan operasi bersifat sementara.", isCorrect: false, rationale: "Pernyataan ini terbalik; proyek bersifat sementara dan operasi bersifat permanen." },
+                    { text: "Operasi menghasilkan produk unik, sedangkan proyek mengulang proses yang sama.", isCorrect: false, rationale: "Operasi menjalankan proses yang sama secara berulang, sedangkan proyek menciptakan keunikan." },
+                    { text: "Proyek bersifat sementara dan unik, sedangkan operasi bersifat permanen dan berulang.", isCorrect: true, rationale: "Inilah perbedaan inti antara kedua bentuk pekerjaan organisasi tersebut." },
+                    { text: "Tidak ada perbedaan signifikan dalam siklus hidup dan tujuannya.", isCorrect: false, rationale: "Siklus hidup dan tujuan operasional sangat berbeda dengan manajemen proyek." }
+                ],
+                hint: "Ingat kembali tabel perbandingan Project vs Operations."
+            },
+            {
+                question: "Apa saja komponen utama yang membentuk Tiga Kendala Utama (Triple Constraint) dalam manajemen proyek?",
+                category: "Week 1: Fundamentals",
+                options: [
+                    { text: "Scope, Time, Cost", isCorrect: true, rationale: "Scope, time, dan cost adalah tiga sisi utama penyeimbang kualitas proyek." },
+                    { text: "Quality, Risk, Procurement", isCorrect: false, rationale: "Ketiganya merupakan bagian dari Knowledge Areas, bukan tiga kendala utama dasar." },
+                    { text: "Team, Leader, Sponsor", isCorrect: false, rationale: "Ini adalah pihak-pihak pemangku kepentingan (stakeholders)." },
+                    { text: "WBS, CPM, Gantt Chart", isCorrect: false, rationale: "Ini adalah perangkat atau teknik perencanaan, bukan kendala proyek." }
+                ],
+                hint: "Ketiga kendala ini saling tarik-menarik dan berpusat pada pencapaian kualitas."
+            },
+            {
+                question: "Karakteristik unik perangkat lunak (software) mencakup Invisibility, Complexity, Conformity, dan Flexibility. Apa arti dari 'Invisibility'?",
+                category: "Week 1: Software Characteristics",
+                options: [
+                    { text: "Perangkat lunak dapat disembunyikan dari pengguna akhir.", isCorrect: false, rationale: "Invisibility bukan berarti menyembunyikan aplikasi." },
+                    { text: "Progres pembuatan perangkat lunak tidak dapat dilihat secara fisik langsung seperti jembatan atau gedung.", isCorrect: true, rationale: "Berbeda dengan konstruksi fisik, kode program tidak memiliki wujud fisik yang kasat mata saat dibangun." },
+                    { text: "Kode program dapat berjalan di latar belakang tanpa diketahui sistem operasi.", isCorrect: false, rationale: "Bukan itu definisi invisibilitas dalam konteks manajemen proyek software." },
+                    { text: "Developer dapat bekerja tanpa harus memperlihatkan hasil kerjanya kepada PM.", isCorrect: false, rationale: "Transparansi tetap wajib dijaga melalui pelacakan task dan task board." }
+                ],
+                hint: "Bandingkan dengan pembangunan gedung atau jembatan yang progresnya terlihat mata."
+            },
+            {
+                question: "Manakah contoh proyek perangkat lunak dengan kategori 'Compulsory' (Wajib)?",
+                category: "Week 1: Software Classification",
+                options: [
+                    { text: "Pembuatan game mobile bertema petualangan fantasi.", isCorrect: false, rationale: "Game adalah contoh proyek sukarela (voluntary) berdasarkan inisiatif kreatif developer." },
+                    { text: "Sistem pencatatan penjualan dan pelaporan pajak perusahaan.", isCorrect: true, rationale: "Sistem wajib digunakan karena tuntutan kepatuhan operasional dan regulasi bisnis." },
+                    { text: "Aplikasi media sosial eksperimental untuk komunitas seni.", isCorrect: false, rationale: "Pengguna memakai aplikasi ini secara sukarela." },
+                    { text: "Platform hiburan streaming musik independen.", isCorrect: false, rationale: "Penggunaan platform hiburan bersifat opsional atau sukarela." }
+                ],
+                hint: "Pilih sistem yang penggunaannya didorong oleh keharusan sistem bisnis/regulasi."
+            },
+            {
+                question: "Apa fungsi utama dari kerangka kerja 10 Knowledge Areas dalam standar manajemen proyek (PMBOK)?",
+                category: "Week 2: Knowledge Areas",
+                options: [
+                    { text: "Menentukan siapa developer yang paling cepat menulis kode.", isCorrect: false, rationale: "Knowledge areas tidak menilai kecepatan penulisan baris kode." },
+                    { text: "Mengelompokkan praktik dan proses manajemen proyek secara terstruktur.", isCorrect: true, rationale: "PMBOK membagi praktik penting menjadi 10 area seperti scope, time, cost, risk, dll." },
+                    { text: "Menggantikan peran Project Manager dengan kecerdasan buatan.", isCorrect: false, rationale: "Kerangka kerja ini panduan bagi manusia/PM, bukan pengganti." },
+                    { text: "Menjamin bahwa anggaran proyek tidak akan pernah mengalami pembengkakan.", isCorrect: false, rationale: "Pembengkakan dapat dicegah dengan kontrol, namun knowledge area adalah cakupan panduan." }
+                ],
+                hint: "Area pengetahuan ini mencakup integrasi, waktu, biaya, kualitas, risiko, dll."
+            },
+            {
+                question: "Manakah peran Project Integration Management di antara 10 Knowledge Areas?",
+                category: "Week 2: Knowledge Areas",
+                options: [
+                    { text: "Berfungsi sebagai 'perekat' yang menyatukan seluruh rencana dan keputusan proyek.", isCorrect: true, rationale: "Integration management mengoordinasikan seluruh area pengetahuan agar berjalan selaras." },
+                    { text: "Fokus khusus hanya pada pengujian bug di akhir sprint.", isCorrect: false, rationale: "Pengujian bug termasuk dalam ranah kualitas dan pengujian." },
+                    { text: "Mengatur pengadaan perangkat keras dari vendor eksternal.", isCorrect: false, rationale: "Pengadaan perangkat keras adalah bagian dari Procurement Management." },
+                    { text: "Menghitung total gaji bulanan programmer secara otomatis.", isCorrect: false, rationale: "Perhitungan gaji masuk ke bagian resource dan cost management secara umum." }
+                ],
+                hint: "Perannya menyatukan seluruh komponen perencanaan yang terpecah-pecah."
+            },
+            {
+                question: "Apa arti dari prinsip manajemen proyek 'Be a diligent steward'?",
+                category: "Week 2: Principles",
+                options: [
+                    { text: "Project Manager harus menuruti seluruh kemauan klien tanpa syarat.", isCorrect: false, rationale: "Stewardship melibatkan etika dan perlindungan sumber daya, bukan menuruti tanpa batas." },
+                    { text: "PM menjaga sumber daya, etika, dan kepentingan organisasi secara bertanggung jawab.", isCorrect: true, rationale: "Stewardship mencakup integritas, penjagaan aset, dan tanggung jawab moral organisasi." },
+                    { text: "PM wajib mencatat kehadiran harian anggota tim di kantor.", isCorrect: false, rationale: "Pencatatan kehadiran adalah tugas administratif operasional biasa." },
+                    { text: "PM fokus menyelesaikan deliverable secepat mungkin tanpa peduli aturan.", isCorrect: false, rationale: "Mengabaikan aturan melanggar prinsip stewardship dan etika." }
+                ],
+                hint: "Berkaitan dengan penjagaan amanah, sumber daya, dan etika profesional."
+            },
+            {
+                question: "Manakah pernyataan yang paling tepat mengenai Critical Success Factors (CSF)?",
+                category: "Week 2: CSF",
+                options: [
+                    { text: "CSF adalah daftar fitur aplikasi yang harus diselesaikan tepat waktu.", isCorrect: false, rationale: "Fitur adalah deliverable, sedangkan CSF adalah kondisi keberhasilan yang lebih luas." },
+                    { text: "CSF adalah kondisi kritis yang harus berjalan dengan baik agar proyek sukses.", isCorrect: true, rationale: "Jika CSF gagal dipenuhi, peluang proyek mengalami kegagalan menjadi sangat tinggi." },
+                    { text: "CSF adalah metrik angka yang mengukur jumlah baris kode per hari.", isCorrect: false, rationale: "Metrik mengukur pencapaian, sedangkan CSF adalah kondisi penentunya." },
+                    { text: "CSF sama persis dengan ruang lingkup out-of-scope proyek.", isCorrect: false, rationale: "Out of scope adalah batasan pekerjaan, bukan faktor kesuksesan." }
+                ],
+                hint: "Kondisi krusial yang jika gagal, proyek hampir pasti bermasalah."
+            },
+            {
+                question: "Apa perbedaan antara metodologi Predictive (Waterfall) dan Adaptive (Agile)?",
+                category: "Week 2 & 3: Methodology",
+                options: [
+                    { text: "Predictive merencanakan detail di awal dengan requirement stabil; Agile beradaptasi dengan perubahan bertahap.", isCorrect: true, rationale: "Predictive berbasis plan-driven, sedangkan Agile berbasis iteratif adaptif." },
+                    { text: "Predictive tidak memerlukan dokumentasi sama sekali, sedangkan Agile wajib memiliki dokumen tebal.", isCorrect: false, rationale: "Pernyataan ini terbalik; waterfall terkenal dengan dokumen spesifikasi lengkap di awal." },
+                    { text: "Agile hanya cocok untuk proyek pembangunan gedung bertingkat.", isCorrect: false, rationale: "Agile digunakan untuk software development dan produk digital dinamis." },
+                    { text: "Predictive tidak mengenal batasan waktu pengerjaan proyek.", isCorrect: false, rationale: "Semua proyek memiliki batasan waktu (temporary)." }
+                ],
+                hint: "Perhatikan tingkat kestabilan requirement dan fleksibilitas perencanaannya."
+            },
+            {
+                question: "Dalam pendekatan metodologi Waterfall, kapan fase pengujian (testing) idealnya dilakukan dalam alur sekuensial murni?",
+                category: "Week 3: Predictive / Waterfall",
+                options: [
+                    { text: "Secara bersamaan sejak hari pertama pembuatan kode (TDD).", isCorrect: false, rationale: "TDD merupakan praktik Agile/XP, bukan waterfall murni sekuensial." },
+                    { text: "Setelah fase implementasi/konstruksi selesai dilaksanakan.", isCorrect: true, rationale: "Dalam waterfall murni, pengujian dilakukan setelah seluruh kode selesai dibangun." },
+                    { text: "Sebelum fase analisis kebutuhan (requirements) dimulai.", isCorrect: false, rationale: "Pengujian tidak mungkin dilakukan sebelum sistem atau kebutuhan didefinisikan." },
+                    { text: "Dilakukan setelah proyek diserahterimakan kepada bagian operasional.", isCorrect: false, rationale: "Pengujian harus dilakukan sebelum serah terima (deployment)." }
+                ],
+                hint: "Alur waterfall mengalir ke bawah dari requirements ke design, build, baru test."
+            },
+            {
+                question: "Apa kepanjangan dan fokus utama dari V-Model dalam manajemen proyek perangkat lunak?",
+                category: "Week 3: V-Model",
+                options: [
+                    { text: "Virtual Model yang fokus pada simulasi 3D antarmuka pengguna.", isCorrect: false, rationale: "Bukan simulasi 3D." },
+                    { text: "Validation & Verification Model yang memetakan setiap fase pembangunan dengan pasangan pengujiannya.", isCorrect: true, rationale: "Sisi kiri membangun spesifikasi, sisi kanan menguji dengan level verifikasi dan validasi yang sesuai." },
+                    { text: "Velocity Model yang mengukur kecepatan penulisan skrip backend.", isCorrect: false, rationale: "Istilah velocity biasa dipakai di Scrum, bukan V-Model." },
+                    { text: "Volume Model untuk menguji kapasitas maksimal server cloud.", isCorrect: false, rationale: "Bukan uji kapasitas server." }
+                ],
+                hint: "Bentuk huruf V merepresentasikan sisi kiri pembangunan dan sisi kanan pengujian."
+            },
+            {
+                question: "Apa perbedaan antara 'Verification' dan 'Validation' dalam pengujian perangkat lunak?",
+                category: "Week 3: V-Model",
+                options: [
+                    { text: "Verification memastikan produk dibangun dengan benar (sesuai spesifikasi); Validation memastikan produk yang dibangun adalah benar (sesuai kebutuhan nyata).", isCorrect: true, rationale: "Verification: Are we building the product right? Validation: Are we building the right product?" },
+                    { text: "Verification dilakukan oleh klien, sedangkan Validation dilakukan oleh programmer magang.", isCorrect: false, rationale: "Pelaku pengujian tidak mendefinisikan perbedaan esensial V&V." },
+                    { text: "Verification menguji database, sedangkan Validation menguji tombol login.", isCorrect: false, rationale: "Keduanya dapat menguji berbagai komponen sistem secara menyeluruh." },
+                    { text: "Tidak ada perbedaan antara verifikasi dan validasi dalam standar PMBOK.", isCorrect: false, rationale: "Keduanya memiliki definisi dan tujuan pengujian yang berbeda." }
+                ],
+                hint: "Ingat kalimat tanya: 'Are we building the product right?' vs 'Are we building the right product?'"
+            },
+            {
+                question: "Kapan pendekatan Predictive (Waterfall) paling tepat untuk dipilih?",
+                category: "Week 3: Methodology Selection",
+                options: [
+                    { text: "Ketika kebutuhan (requirements) sangat stabil, jelas, dan terikat regulasi ketat.", isCorrect: true, rationale: "Waterfall unggul jika spesifikasi sudah pasti dan perubahan sangat mahal atau dibatasi aturan." },
+                    { text: "Ketika klien sama sekali belum tahu fitur apa yang mereka inginkan.", isCorrect: false, rationale: "Jika klien belum tahu, pendekatan adaptif/Agile jauh lebih cocok." },
+                    { text: "Ketika waktu pengerjaan hanya 2 hari dengan tim beranggotakan 2 orang.", isCorrect: false, rationale: "Proyek skala kecil eksperimental lebih cocok menggunakan pendekatan iteratif cepat." },
+                    { text: "Ketika startup ingin meluncurkan produk inovatif baru ke pasar kompetitif.", isCorrect: false, rationale: "Startup dengan ketidakpastian tinggi membutuhkan fleksibilitas Agile." }
+                ],
+                hint: "Pilih kondisi di mana spesifikasi sudah dikunci dan tidak boleh sering berubah."
+            },
+            {
+                question: "Apa landasan utama dari Manifesto Agile yang diterbitkan pada tahun 2001?",
+                category: "Week 4: Agile Manifesto",
+                options: [
+                    { text: "Mengutamakan proses formal dan kontrak legal yang ketat.", isCorrect: false, rationale: "Kontrak legal ada di sisi kanan manifesto, bukan nilai utama yang diutamakan." },
+                    { text: "Mengutamakan individu & interaksi, perangkat lunak berfungsi, kolaborasi klien, dan respons terhadap perubahan.", isCorrect: true, rationale: "Inilah 4 nilai inti dari Agile Manifesto." },
+                    { text: "Menghapuskan seluruh dokumentasi teknis dalam dunia pemrograman.", isCorrect: false, rationale: "Agile tidak menghapus dokumentasi, melainkan membuat dokumentasi secukupnya (just-enough)." },
+                    { text: "Mengharuskan manajer proyek mengambil alih seluruh tugas coding tim.", isCorrect: false, rationale: "Tim dalam Agile bersifat mandiri dan lintas fungsi (self-organizing)." }
+                ],
+                hint: "Perhatikan perbandingan nilai kiri atas vs kanan pada Agile Manifesto."
+            },
+            {
+                question: "Manakah yang merupakan salah satu dari 12 prinsip Agile?",
+                category: "Week 4: Agile Principles",
+                options: [
+                    { text: "Menunda pengiriman produk hingga seluruh fitur selesai 100% sempurna di akhir tahun.", isCorrect: false, rationale: "Prinsip Agile mengutamakan pengiriman perangkat lunak bernilai secara dini dan berkala." },
+                    { text: "Kepuasan pelanggan melalui pengiriman perangkat lunak yang bernilai secara dini dan berkelanjutan.", isCorrect: true, rationale: "Ini adalah prinsip pertama dari 12 prinsip Agile Manifesto." },
+                    { text: "Melarang keras perubahan kebutuhan meskipun di awal proyek.", isCorrect: false, rationale: "Agile justru menyambut perubahan kebutuhan bahkan di tahap akhir pengembangan." },
+                    { text: "Komunikasi paling efektif dilakukan lewat email formal mingguan.", isCorrect: false, rationale: "Prinsip Agile merekomendasikan percakapan tatap muka secara langsung (face-to-face)." }
+                ],
+                hint: "Prinsip utama berkaitan dengan kepuasan pelanggan dan pengiriman software bernilai secara awal."
+            },
+            {
+                question: "Dalam kerangka kerja Scrum, apa peran utama dari seorang Product Owner (PO)?",
+                category: "Week 4: Scrum Roles",
+                options: [
+                    { text: "Mengamankan tim dari gangguan eksternal dan memfasilitasi meeting harian.", isCorrect: false, rationale: "Tugas tersebut adalah tanggung jawab seorang Scrum Master." },
+                    { text: "Menulis kode program backend dan melakukan unit testing.", isCorrect: false, rationale: "Itu adalah tugas dari Development Team." },
+                    { text: "Bertanggung jawab atas nilai produk, mengelola Product Backlog, dan memprioritaskan fitur.", isCorrect: true, rationale: "PO merepresentasikan suara bisnis/klien dan menentukan urutan nilai fitur di backlog." },
+                    { text: "Memberikan sanksi kepada anggota tim yang terlambat hadir meeting.", isCorrect: false, rationale: "Scrum menganut akuntabilitas bersama dan bukan budaya kepemimpinan direktif." }
+                ],
+                hint: "PO memegang visi produk dan mengelola Product Backlog berdasarkan nilai bisnis."
+            },
+            {
+                question: "Apa fungsi utama dari Scrum Master dalam sebuah tim Agile?",
+                category: "Week 4: Scrum Roles",
+                options: [
+                    { text: "Berperan sebagai pemimpin pelayan (servant leader) yang memfasilitasi proses Scrum dan menghapus hambatan tim.", isCorrect: true, rationale: "Scrum Master memastikan proses Scrum berjalan lancar dan melindungi tim dari gangguan." },
+                    { text: "Menentukan anggaran akhir dan menyetujui kontrak harga dengan vendor.", isCorrect: false, rationale: "Pengaturan kontrak dan anggaran umumnya dipegang oleh Project Sponsor atau Manajer Senior." },
+                    { text: "Menulis spesifikasi dokumen Waterfall setebal 300 halaman.", isCorrect: false, rationale: "Scrum tidak berfokus pada dokumen tebal waterfall." },
+                    { text: "Menjadi bos yang memberikan perintah teknis harian kepada programmer.", isCorrect: false, rationale: "Scrum Master bukan bos direktif, melainkan fasilitator dan pelayan tim." }
+                ],
+                hint: "Ingat konsep Servant Leadership dan pelindung tim dari hambatan (impediments)."
+            },
+            {
+                question: "Berapa durasi waktu standar (timebox) untuk kegiatan Daily Standup (Daily Scrum)?",
+                category: "Week 4: Scrum Events",
+                options: [
+                    { text: "Maksimal 15 menit.", isCorrect: true, rationale: "Daily standup dirancang singkat dan padat maksimal 15 menit." },
+                    { text: "Tepat 2 jam setiap hari.", isCorrect: false, rationale: "2 jam terlalu lama untuk meeting harian singkat." },
+                    { text: "Setengah hari kerja (4 jam).", isCorrect: false, rationale: "Itu durasi untuk lokakarya perencanaan yang panjang." },
+                    { text: "1 minggu penuh.", isCorrect: false, rationale: "1 minggu adalah durasi minimum sebuah Sprint." }
+                ],
+                hint: "Meeting ini dilakukan berdiri cepat untuk sinkronisasi harian."
+            },
+            {
+                question: "Apa yang dimaksud dengan 'Sprint' dalam kerangka kerja Scrum?",
+                category: "Week 4: Scrum Events",
+                options: [
+                    { text: "Periode iterasi dengan waktu terbatas (timeboxed) antara 1 hingga 4 minggu untuk menghasilkan increment produk.", isCorrect: true, rationale: "Sprint adalah jantung Scrum berupa siklus iterasi tetap." },
+                    { text: "Lomba kecepatan antar programmer untuk menyelesaikan kode terbanyak.", isCorrect: false, rationale: "Sprint bukan kompetisi kecepatan individu." },
+                    { text: "Dokumen penutupan proyek di akhir masa kontrak.", isCorrect: false, rationale: "Dokumen penutupan adalah fase penutup proyek formal." },
+                    { text: "Sesi presentasi tahunan kepada dewan direksi perusahaan.", isCorrect: false, rationale: "Sprint berdurasi singkat mingguan/bulanan." }
+                ],
+                hint: "Iterasi berdurasi tetap (1-4 minggu) tempat increment produk dibangun."
+            },
+            {
+                question: "Apa perbedaan utama antara metodologi Scrum dan Kanban?",
+                category: "Week 4: Kanban & Scrum",
+                options: [
+                    { text: "Scrum menggunakan Sprint berdurasi tetap dengan peran spesifik; Kanban fokus pada visualisasi alur kerja dan pembatasan WIP (Work in Progress).", isCorrect: true, rationale: "Kanban bersifat kontinu dengan pembatasan WIP, sedangkan Scrum menggunakan sprint terikat waktu." },
+                    { text: "Kanban hanya boleh digunakan untuk industri manufaktur mobil Jepang.", isCorrect: false, rationale: "Kanban telah diadopsi luas dalam manajemen software modern." },
+                    { text: "Scrum tidak mengenal adanya papan tugas visual.", isCorrect: false, rationale: "Scrum justru sangat bergantung pada visualisasi backlog dan task board." },
+                    { text: "Tidak ada perbedaan antara Scrum dan Kanban dalam praktik industri.", isCorrect: false, rationale: "Keduanya memiliki aturan event, artefak, dan prinsip aliran yang berbeda." }
+                ],
+                hint: "Kanban terkenal dengan papan visual (signboard) dan pembatasan Work in Progress (WIP)."
+            },
+            {
+                question: "Apa tujuan utama dari pembuatan Project Charter di awal proyek (Week 5)?",
+                category: "Week 5: Project Charter & Scope",
+                options: [
+                    { text: "Memberikan otorisasi resmi atas keberadaan proyek dan memberikan wewenang kepada Project Manager.", isCorrect: true, rationale: "Project Charter adalah dokumen legalisasi formal proyek dari sponsor." },
+                    { text: "Menuliskan seluruh kode program secara lengkap sebelum proyek dimulai.", isCorrect: false, rationale: "Charter berisi informasi tingkat tinggi (high-level), bukan baris kode." },
+                    { text: "Menghitung laba rugi perusahaan dalam kurun waktu 10 tahun ke depan.", isCorrect: false, rationale: "Perhitungan finansial mendalam ada di studi kelayakan (business case)." },
+                    { text: "Menggantikan seluruh kontrak kerja sama hukum dengan klien.", isCorrect: false, rationale: "Charter adalah dokumen internal/eksternal otorisasi proyek, bukan pengganti kontrak hukum." }
+                ],
+                hint: "Dokumen yang mengesahkan dimulainya proyek dan menunjuk PM secara resmi."
+            },
+            {
+                question: "Apa kepanjangan dari kriteria SMART dalam menentukan tujuan (objectives) proyek?",
+                category: "Week 5: SMART Goals",
+                options: [
+                    { text: "Simple, Measurable, Actionable, Relevant, Timely", isCorrect: false, rationale: "Beberapa kata kurang tepat; S adalah Specific dan A adalah Achievable." },
+                    { text: "Specific, Measurable, Achievable, Relevant, Time-bound", isCorrect: true, rationale: "Inilah akronim standar untuk menyusun tujuan yang jelas dan terukur." },
+                    { text: "Systematic, Modern, Accurate, Reliable, Tested", isCorrect: false, rationale: "Itu bukan kriteria penetapan tujuan SMART." },
+                    { text: "Strategic, Managed, Advanced, Rapid, Technical", isCorrect: false, rationale: "Bukan definisi SMART dalam manajemen proyek." }
+                ],
+                hint: "S=Specific, M=Measurable, A=Achievable, R=Relevant, T=Time-bound."
+            },
+            {
+                question: "Mengapa pembatasan 'In Scope' dan 'Out of Scope' sangat krusial dalam Project Scope Statement?",
+                category: "Week 5: Scope Management",
+                options: [
+                    { text: "Untuk mencegah terjadinya pembengkakan ruang lingkup (scope creep) yang tidak terkontrol.", isCorrect: true, rationale: "Kejelasan batas pekerjaan melindungi proyek dari penambahan fitur ilegal di tengah jalan." },
+                    { text: "Agar tim developer bisa pulang lebih cepat dari jadwal kantor.", isCorrect: false, rationale: "Bukan untuk mengatur jam pulang kantor tim." },
+                    { text: "Supaya sponsor tidak perlu membayar biaya tambahan kepada tim.", isCorrect: false, rationale: "Scope statement mengatur batasan deliverable, bukan penghapusan hak bayar." },
+                    { text: "Agar dokumen proyek terlihat sangat tebal dan profesional.", isCorrect: false, rationale: "Ketebalan dokumen bukan tujuan utama pembatasan ruang lingkup." },
+                ],
+                hint: "Menghindari fenomena penambahan pekerjaan terselubung tanpa persetujuan (scope creep)."
+            },
+            {
+                question: "Apa arti dari aturan '100% Rule' dalam pembuatan Work Breakdown Structure (WBS)?",
+                category: "Week 6: WBS",
+                options: [
+                    { text: "WBS harus mencakup 100% dari seluruh pekerjaan yang ditentukan dalam project scope, baik internal maupun eksternal.", isCorrect: true, rationale: "Aturan 100% menyatakan WBS mencakup seluruh ruang lingkup tanpa ada pekerjaan yang tertinggal." },
+                    { text: "Semua anggota tim wajib hadir 100% saat rapat pembuatan WBS.", isCorrect: false, rationale: "Bukan aturan kehadiran rapat." },
+                    { text: "Proyek dijamin 100% sukses tanpa ada risiko kegagalan.", isCorrect: false, rationale: "WBS membantu manajemen, namun tidak menghilangkan risiko secara mutlak." },
+                    { text: "Anggaran proyek harus dihabiskan 100% dalam minggu pertama.", isCorrect: false, rationale: "Pengeluaran anggaran diatur bertahap sesuai baseline." }
+                ],
+                hint: "WBS harus merepresentasikan seluruh ruang lingkup pekerjaan proyek secara utuh."
+            },
+            {
+                question: "Apa tingkatan hierarki standar dalam penyusunan WBS yang dipelajari di kelas?",
+                category: "Week 6: WBS Hierarchy",
+                options: [
+                    { text: "Level 1: Task, Level 2: Subtask, Level 3: Activity", isCorrect: false, rationale: "Bukan penamaan level hierarki WBS standar." },
+                    { text: "Level 1: Nama Proyek, Level 2: Deliverables Utama / Fase, Level 3: Work Package.", isCorrect: true, rationale: "Struktur 3 level WBS mencakup proyek, deliverable/fase, dan work package terkecil." },
+                    { text: "Level 1: Baris Kode, Level 2: Modul, Level 3: Sistem.", isCorrect: false, rationale: "Itu adalah struktur dekomposisi kode pemrograman, bukan WBS manajemen proyek." },
+                    { text: "Level 1: Anggaran, Level 2: Durasi, Level 3: Risiko.", isCorrect: false, rationale: "Itu adalah elemen knowledge areas, bukan hirarki WBS." }
+                ],
+                hint: "Level tertinggi adalah proyek, diikuti deliverables/fase, hingga paket pekerjaan terkecil."
+            },
+            {
+                question: "Apa yang dimaksud dengan 'Work Package' dalam WBS?",
+                category: "Week 6: Work Package",
+                options: [
+                    { text: "Paket bingkisan hadiah untuk klien yang menandatangani kontrak.", isCorrect: false, rationale: "Bukan hadiah untuk klien." },
+                    { text: "Unit pekerjaan terkecil di level terendah WBS yang dapat diestimasi biaya dan durasinya.", isCorrect: true, rationale: "Work package adalah dasar untuk melakukan estimasi dan pengendalian." },
+                    { text: "Kumpulan seluruh dokumen spesifikasi yang dibungkus dalam map plastik.", isCorrect: false, rationale: "Bukan sekadar map dokumen." },
+                    { text: "Software open source siap pakai yang diunduh dari internet.", isCorrect: false, rationale: "Bukan perangkat lunak unduhan." }
+                ],
+                hint: "Unit terkecil dalam WBS yang menjadi dasar estimasi effort dan biaya."
+            },
+            {
+                question: "Manakah karakteristik dari 'Analogous Estimating' (Top-Down Estimating)?",
+                category: "Week 6: Estimation Techniques",
+                options: [
+                    { text: "Menggunakan data historis dari proyek serupa di masa lalu untuk estimasi cepat.", isCorrect: true, rationale: "Analogous memanfaatkan kemiripan dengan proyek terdahulu sehingga cepat dan murah." },
+                    { text: "Menghitung setiap baris kode secara detail dari level terbawah WBS.", isCorrect: false, rationale: "Menghitung detail level terbawah adalah karakteristik Bottom-Up estimating." },
+                    { text: "Menggunakan rumus statistik matematis murni per unit halaman web.", isCorrect: false, rationale: "Rumus statistik per unit adalah Parametric estimating." },
+                    { text: "Estimasi dilakukan secara acak tanpa dasar data sama sekali.", isCorrect: false, rationale: "Estimasi proyek selalu membutuhkan dasar dan asumsi yang jelas." }
+                ],
+                hint: "Mengandalkan kemiripan dengan proyek masa lalu (historical data)."
+            },
+            {
+                question: "Apa kelemahan utama dari 'Analogous Estimating'?",
+                category: "Week 6: Estimation Techniques",
+                options: [
+                    { text: "Membutuhkan waktu berbulan-bulan untuk menghitungnya.", isCorrect: false, rationale: "Analogous justru merupakan teknik yang sangat cepat." },
+                    { text: "Memiliki tingkat akurasi yang cenderung rendah karena mengandalkan kemiripan makro.", isCorrect: true, rationale: "Karena berbasis kemiripan tingkat tinggi, detail unik proyek baru sering terlewat." },
+                    { text: "Tidak bisa digunakan untuk proyek perangkat lunak sama sekali.", isCorrect: false, rationale: "Bisa digunakan, terutama pada estimasi awal level 1 atau 2." },
+                    { text: "Terlalu rumit dan memerlukan kalkulator khusus.", isCorrect: false, rationale: "Perhitungannya sangat sederhana." }
+                ],
+                hint: "Cepat dan murah, namun akurasinya tidak sebaik bottom-up."
+            },
+            {
+                question: "Bagaimana cara kerja 'Parametric Estimating' dalam memperkirakan biaya atau durasi proyek?",
+                    category: "Week 6: Estimation Techniques",
+                options: [
+                    { text: "Mengalikan parameter unit kerja (misal: biaya per halaman web) dengan jumlah total unit.", isCorrect: true, rationale: "Parametric menggunakan hubungan statistik antara data historis dan parameter proyek." },
+                    { text: "Menanyakan perkiraan kepada seluruh anggota tim secara acak.", isCorrect: false, rationale: "Itu mirip teknik Delphi atau brainstorming." },
+                    { text: "Mengabaikan data masa lalu dan fokus pada intuisi manajer.", isCorrect: false, rationale: "Parametric sangat bergantung pada data historis yang valid." },
+                    { text: "Menjumlahkan seluruh biaya dari level terbawah WBS secara bertahap.", isCorrect: false, rationale: "Menjumlahkan dari bawah ke atas adalah Bottom-Up costing." }
+                ],
+                hint: "Menggunakan parameter matematis/statistik (misal: cost per module atau cost per page)."
+            },
+            {
+                question: "Apa keunggulan utama dari 'Bottom-Up Estimating'?",
+                category: "Week 6: Estimation Techniques",
+                options: [
+                    { text: "Paling cepat diselesaikan dalam waktu 5 menit.", isCorrect: false, rationale: "Bottom-up membutuhkan waktu dan detail yang banyak." },
+                    { text: "Memiliki tingkat akurasi yang tinggi karena dihitung dari detail paket pekerjaan terkecil (Level 3).", isCorrect: true, rationale: "Estimasi dilakukan per work package lalu digulung ke atas (roll-up)." },
+                    { text: "Tidak memerlukan WBS sama sekali.", isCorrect: false, rationale: "Bottom-up justru sangat bergantung pada WBS yang detail." },
+                    { text: "Biaya pembuatannya paling murah di antara semua teknik.", isCorrect: false, rationale: "Membutuhkan usaha dan waktu analisis yang lebih besar." }
+                ],
+                hint: "Dihitung dari level terbawah (work package) lalu digulung ke atas."
+            },
+            {
+                question: "Apa hubungan antara WBS dan penjadwalan (Schedule)?",
+                category: "Week 7: WBS to Schedule",
+                options: [
+                    { text: "WBS adalah jadwal itu sendiri dalam bentuk kalender.", isCorrect: false, rationale: "WBS menjawab WHAT (apa saja lingkupnya), sedangkan schedule menjawab WHEN (kapan dan urutannya)." },
+                    { text: "WBS menjawab apa saja ruang lingkup pekerjaan (WHAT), yang kemudian dipecah menjadi aktivitas dan diurutkan dalam jadwal (WHEN).", isCorrect: true, rationale: "WBS menjadi fondasi untuk mendefinisikan aktivitas, durasi, dan dependensi." },
+                    { text: "WBS hanya dibuat setelah jadwal selesai 100% oleh klien.", isCorrect: false, rationale: "WBS dibuat sebelum jadwal disusun." },
+                    { text: "WBS dan jadwal adalah dokumen yang sama sekali tidak saling berkaitan.", isCorrect: false, rationale: "Jadwal yang baik wajib bersumber dari WBS." }
+                ],
+                hint: "WBS menjawab 'WHAT', sedangkan Schedule menjawab 'WHEN'."
+            },
+            {
+                question: "Manakah jenis ketergantungan (dependency) antar aktivitas yang paling umum digunakan dalam manajemen proyek?",
+                category: "Week 7: Dependencies",
+                options: [
+                    { text: "Start-to-Finish (SF)", isCorrect: false, rationale: "SF sangat jarang digunakan dalam praktik normal." },
+                    { text: "Finish-to-Start (FS)", isCorrect: true, rationale: "FS (A selesai dulu baru B mulai) adalah tipe dependency paling umum." },
+                    { text: "Start-to-Start (SS) tanpa batasan apapun", isCorrect: false, rationale: "SS digunakan untuk paralel tertentu, namun FS adalah yang paling dominan." },
+                    { text: "Finish-to-Finish (FF) terbalik", isCorrect: false, rationale: "FF sering dipakai untuk dokumentasi atau testing, tapi bukan yang paling utama dibanding FS." }
+                ],
+                hint: "Aktivitas pendahulu harus selesai sepenuhnya sebelum aktivitas penerus bisa dimulai."
+            },
+            {
+                question: "Apa yang dimaksud dengan 'Critical Path' dalam Critical Path Method (CPM)?",
+                category: "Week 7: CPM",
+                options: [
+                    { text: "Rantai aktivitas terpendek dalam jaringan proyek.", isCorrect: false, rationale: "Critical path adalah rantai terpanjang, bukan terpendek." },
+                    { text: "Rantai aktivitas terpanjang yang menentukan durasi total minimum penyelesaian proyek.", isCorrect: true, rationale: "Jalur kritis menentukan total waktu proyek; jika ada penundaan di jalur ini, proyek pasti terlambat." },
+                    { text: "Daftar aktivitas yang tidak memiliki risiko sama sekali.", isCorrect: false, rationale: "Aktivitas di jalur kritis justru memiliki risiko keterlambatan tertinggi." },
+                    { text: "Jalur anggaran keuangan yang mengalami defisit terbesar.", isCorrect: false, rationale: "CPM berkaitan dengan durasi waktu dan jadwal, bukan defisit keuangan." }
+                ],
+                hint: "Rantai urutan aktivitas terpanjang yang menentukan total durasi proyek."
+            },
+            {
+                question: "Berapa nilai 'float' (slack) untuk aktivitas yang berada di atas Critical Path?",
+                category: "Week 7: CPM Float",
+                options: [
+                    { text: "Selalu bernilai 0 (nol).", isCorrect: true, rationale: "Aktivitas di jalur kritis memiliki float = 0; telat 1 hari berarti proyek telat 1 hari." },
+                    { text: "Selalu bernilai 100 hari.", isCorrect: false, rationale: "Nilai float kritis adalah nol." },
+                    { text: "Bergantung pada jumlah anggota tim yang cuti.", isCorrect: false, rationale: "Float dihitung dari selisih LS - ES atau LF - EF." },
+                    { text: "Selalu bernilai negatif.", isCorrect: false, rationale: "Float normal bernilai nol atau positif." }
+                ],
+                hint: "Kelonggaran waktu (float) pada jalur kritis bernilai nol."
+            },
+            {
+                question: "Apa fungsi utama dari sebuah Gantt Chart?",
+                category: "Week 7: Gantt Chart",
+                options: [
+                    { text: "Sebagai alat komunikasi visual untuk menampilkan jadwal, durasi, dan waktu pelaksanaan aktivitas.", isCorrect: true, rationale: "Gantt chart sangat baik untuk komunikasi visual waktu (WHEN) per aktivitas." },
+                    { text: "Sebagai pengganti dokumen WBS dan ruang lingkup proyek.", isCorrect: false, rationale: "Gantt chart bukan pengganti WBS; membuat Gantt tanpa WBS mudah memicu scope creep." },
+                    { text: "Sebagai kalkulator otomatis perhitungan pajak perusahaan.", isCorrect: false, rationale: "Bukan alat hitung pajak." },
+                    { text: "Sebagai database penyimpanan kode sumber program.", isCorrect: false, rationale: "Database kode sumber disimpan di Git/GitHub." }
+                ],
+                hint: "Visualisasi batang waktu (timeline) untuk komunikasi jadwal."
+            },
+            {
+                question: "Apa yang dimaksud dengan 'Cost Baseline' dalam Cost Management?",
+                category: "Week 7: Cost Management",
+                options: [
+                    { text: "Anggaran biaya proyek yang telah disetujui (approved budget) terhadap waktu sebagai acuan pengukuran kinerja.", isCorrect: true, rationale: "Cost baseline menjadi acuan objektif untuk menilai apakah proyek overbudget atau hemat." },
+                    { text: "Estimasi biaya kasar yang dibuat oleh anggota magang di awal rapat.", isCorrect: false, rationale: "Baseline adalah anggaran resmi yang disetujui sponsor." },
+                    { text: "Total pengeluaran tak terduga tanpa batas waktu.", isCorrect: false, rationale: "Baseline terikat dengan alokasi waktu proyek." },
+                    { text: "Gaji minimum bulanan untuk posisi Project Manager.", isCorrect: false, rationale: "Bukan standar gaji individu." }
+                ],
+                hint: "Anggaran resmi yang disetujui untuk mengukur kinerja biaya terhadap waktu."
+            },
+            {
+                question: "Manakah contoh biaya 'Direct Cost' dalam sebuah proyek perangkat lunak?",
+                category: "Week 7: Cost Types",
+                options: [
+                    { text: "Gaji programmer yang secara khusus dipekerjakan untuk mengerjakan proyek tersebut.", isCorrect: true, rationale: "Gaji langsung tim proyek adalah direct cost." },
+                    { text: "Biaya sewa gedung kantor pusat dan tagihan listrik bersama.", isCorrect: false, rationale: "Sewa kantor dan listrik bersama adalah indirect cost (overhead)." },
+                    { text: "Pajak tahunan gedung perusahaan.", isCorrect: false, rationale: "Termasuk biaya tidak langsung." },
+                    { text: "Biaya kebersihan taman kantor.", isCorrect: false, rationale: "Biaya operasional umum perusahaan." }
+                ],
+                hint: "Biaya yang dapat diatribusikan secara langsung kepada proyek."
+            },
+            {
+                question: "Apa arti dari metode 'Roll-up' biaya dari WBS?",
+                category: "Week 7: Cost Roll-up",
+                options: [
+                    { text: "Menjumlahkan estimasi biaya dari level terendah (Work Package) ke Level 2 hingga Level 1 (total proyek).", isCorrect: true, rationale: "Bottom-up costing menjumlahkan biaya work package digulung ke atas." },
+                    { text: "Menggulung dokumen kertas laporan keuangan ke dalam tabung.", isCorrect: false, rationale: "Bukan menggulung kertas dokumen." },
+                    { text: "Menghapus seluruh anggaran jika terjadi kesalahan ketik.", isCorrect: false, rationale: "Bukan penghapusan anggaran." },
+                    { text: "Membagi rata total anggaran ke seluruh karyawan perusahaan.", isCorrect: false, rationale: "Bukan pembagian rata gaji." }
+                ],
+                hint: "Menjumlahkan biaya dari paket pekerjaan paling bawah ke atas secara bertahap."
+            },
+            {
+                question: "Manakah yang termasuk ke dalam 4 tipe ketergantungan (dependency) jadwal?",
+                category: "Week 7: Dependencies",
+                options: [
+                    { text: "Finish-to-Start (FS), Start-to-Start (SS), Finish-to-Finish (FF), Start-to-Finish (SF)", isCorrect: true, rationale: "Keempatnya adalah tipe dependency resmi dalam manajemen jadwal proyek." },
+                    { text: "Fast-tracking, Crashing, Buffering, Leveling", isCorrect: false, rationale: "Itu adalah teknik kompresi jadwal (schedule compression), bukan tipe dependency." },
+                    { text: "Waterfall, Agile, V-Model, Hybrid", isCorrect: false, rationale: "Itu adalah metodologi siklus hidup proyek." },
+                    { text: "Direct, Indirect, Fixed, Variable", isCorrect: false, rationale: "Itu adalah jenis-jenis biaya (cost types)." }
+                ],
+                hint: "Melibatkan kombinasi kata Finish dan Start."
+            },
+            {
+                question: "Apa jebakan utama yang sering terjadi saat melakukan Daily Standup meeting di Scrum?",
+                category: "Week 4: Scrum Pitfalls",
+                options: [
+                    { text: "Berubah fungsi menjadi laporan status formal (status report) kepada manajer alih-alih sinkronisasi tim.", isCorrect: true, rationale: "Daily standup adalah sinkronisasi antar developer, bukan laporan bos ke bawahan." },
+                    { text: "Meeting dilakukan sambil duduk di kursi yang empuk.", isCorrect: false, rationale: "Posisi duduk tidak melanggar aturan esensial scrum." },
+                    { text: "Anggota tim berbicara menggunakan bahasa asing.", isCorrect: false, rationale: "Bahasa komunikasi disesuaikan kenyamanan tim." },
+                    { text: "Meeting selesai tepat dalam waktu 2 menit.", isCorrect: false, rationale: "Selesai cepat justru sangat baik dalam timebox." }
+                ],
+                hint: "Jangan jadikan meeting harian ini sebagai ajang melapor kepada atasan semata."
+            },
+            {
+                question: "Manakah prinsip Lean Software Development yang bertujuan mengurangi pemborosan (waste)?",
+                category: "Week 4: Lean",
+                options: [
+                    { text: "Eliminate waste (menghilangkan pemborosan seperti fitur yang tidak perlu atau pekerjaan setengah jadi).", isCorrect: true, rationale: "Prinsip utama Lean adalah mengeliminasi segala bentuk waste." },
+                    { text: "Memperbanyak jumlah dokumen kontrak hukum setebal mungkin.", isCorrect: false, rationale: "Dokumen berlebih yang tidak bernilai adalah bentuk waste dalam Lean." },
+                    { text: "Memperlama waktu tunggu persetujuan manajemen.", isCorrect: false, rationale: "Waktu tunggu (waiting) adalah salah satu tipe waste yang harus dieliminasi." },
+                    { text: "Merekrut 100 orang manajer baru tanpa penambahan programmer.", isCorrect: false, rationale: "Bukan prinsip efisiensi Lean." }
+                ],
+                hint: "Fokus pada maksimalisasi nilai dan eliminasi aktivitas yang tidak bernilai."
+            },
+            {
+                question: "Apa yang dimaksud dengan 'Definition of Done' (DoD) dalam Scrum?",
+                category: "Week 4: Scrum DoD",
+                options: [
+                    { text: "Kesepakatan bersama tim mengenai kriteria apa saja yang harus dipenuhi agar pekerjaan dianggap benar-benar selesai.", isCorrect: true, rationale: "DoD memastikan kualitas terjaga sebelum sebuah increment dinyatakan selesai." },
+                    { text: "Surat pengunduran diri programmer dari perusahaan.", isCorrect: false, rationale: "Tidak ada hubungannya dengan pengunduran diri." },
+                    { text: "Jadwal libur nasional bagi seluruh staf IT.", isCorrect: false, rationale: "Bukan jadwal liburan." },
+                    { text: "Anggaran biaya proyek yang sudah habis sepenuhnya.", isCorrect: false, rationale: "Bukan kehabisan anggaran." }
+                ],
+                hint: "Definisi standar kualitas yang disepakati bersama agar item backlog disebut selesai."
+            },
+            {
+                question: "Apa karakteristik utama dari pendekatan 'Hybrid Project Management'?",
+                category: "Week 5: Hybrid",
+                options: [
+                    { text: "Menggabungkan elemen pendekatan tradisional (Predictive) dan adaptif (Agile) sesuai konteks proyek.", isCorrect: true, rationale: "Hybrid memadukan waterfall dan agile (misal: arsitektur fixed di awal, fitur iteratif dengan scrum)." },
+                    { text: "Menggunakan dua bahasa pemrograman berbeda secara bersamaan.", isCorrect: false, rationale: "Hybrid mencakup metodologi manajemen, bukan sekadar bahasa pemrograman." },
+                    { text: "Menggunakan komputer jinjing hybrid touchscreen.", isCorrect: false, rationale: "Tidak berkaitan dengan jenis perangkat keras komputer." },
+                    { text: "Proyek dikerjakan secara online dan offline secara bergantian.", isCorrect: false, rationale: "Bukan metode kerja jarak jauh." }
+                ],
+                hint: "Memadukan praktik predictive dan agile demi menyesuaikan kebutuhan nyata proyek."
+            },
+            {
+                question: "Apa perbedaan utama antara 'Product Scope' dan 'Project Scope'?",
+                category: "Week 5: Scope Management",
+                options: [
+                    { text: "Product Scope berfokus pada fitur dan fungsi produk; Project Scope berfokus pada pekerjaan yang harus dilakukan untuk menghasilkan produk tersebut.", isCorrect: true, rationale: "Product scope = what features the product has; Project scope = what work is needed to build it." },
+                    { text: "Product Scope hanya dibuat oleh bagian keuangan perusahaan.", isCorrect: false, rationale: "Product scope disusun berdasarkan kebutuhan solusi dan pengguna." },
+                    { text: "Project Scope tidak memerlukan anggaran biaya.", isCorrect: false, rationale: "Semua aspek proyek memerlukan pengelolaan anggaran dan sumber daya." },
+                    { text: "Tidak ada perbedaan antara produk dan pekerjaan proyek.", isCorrect: false, rationale: "Keduanya diukur dengan standar yang berbeda (spesifikasi produk vs rencana proyek)." }
+                ],
+                hint: "Fitur produk (product scope) vs pekerjaan untuk membuat produk (project scope)."
+            },
+            {
+                question: "Apa yang dimaksud dengan 'Scope Creep' dalam manajemen proyek?",
+                category: "Week 5: Scope Creep",
+                options: [
+                    { text: "Penambahan ruang lingkup atau fitur secara perlahan tanpa kontrol, evaluasi dampak, atau penyesuaian waktu dan biaya.", isCorrect: true, rationale: "Scope creep adalah musuh utama proyek yang menyebabkan pembengkakan jadwal dan anggaran." },
+                    { text: "Penurunan jumlah bug dalam aplikasi secara drastis.", isCorrect: false, rationale: "Penurunan bug adalah indikator peningkatan kualitas." },
+                    { text: "Kenaikan gaji karyawan secara berkala setiap tahun.", isCorrect: false, rationale: "Bukan kenaikan gaji." },
+                    { text: "Proses audit keuangan oleh akuntan publik eksternal.", isCorrect: false, rationale: "Bukan audit keuangan." }
+                ],
+                hint: "Fenomena penambahan lingkup kerja secara diam-diam tanpa kontrol perubahan resmi."
+            },
+            {
+                question: "Manakah teknik pengumpulan kebutuhan (Collect Requirements) yang paling efektif untuk menggali informasi mendalam dan rahasia dari narasumber kunci?",
+                category: "Week 5: Requirements",
+                options: [
+                    { text: "Wawancara (Interviews)", isCorrect: true, rationale: "Wawancara satu persatu sangat efektif untuk informasi detail dan rahasia." },
+                    { text: "Menulis surat terbuka di koran harian nasional.", isCorrect: false, rationale: "Surat terbuka tidak efektif dan membocorkan rahasia perusahaan." },
+                    { text: "Membiarkan komputer menebak sendiri keinginan pengguna.", isCorrect: false, rationale: "Komputer membutuhkan panduan dan spesifikasi dari manusia." },
+                    { text: "Mengabaikan masukan dari seluruh stakeholder.", isCorrect: false, rationale: "Mengabaikan stakeholder memicu kegagalan proyek." }
+                ],
+                hint: "Metode tatap muka personal tanya-jawab secara langsung."
+            },
+            {
+                question: "Apa fungsi dari 'Requirements Traceability Matrix' (RTM)?",
+                category: "Week 5: RTM",
+                options: [
+                    { text: "Menghubungkan setiap kebutuhan (requirement) ke asal usulnya hingga deliverable, desain, dan test case.", isCorrect: true, rationale: "RTM memastikan setiap kebutuhan terakomodasi dan terlacak di pengujian." },
+                    { text: "Menampilkan peta lokasi kantor cabang perusahaan di seluruh dunia.", isCorrect: false, rationale: "Bukan peta geografis kantor." },
+                    { text: "Mencatat daftar hadir harian tim pengembang.", isCorrect: false, rationale: "Bukan daftar absensi harian." },
+                    { text: "Menghitung jumlah kalori yang dikonsumsi tim saat lembur.", isCorrect: false, rationale: "Tidak berkaitan dengan konsumsi makanan tim." }
+                ],
+                hint: "Matriks yang melacak keterhubungan dari kebutuhan awal hingga test case pengujian."
+            },
+            {
+                question: "Apa perbedaan utama antara Project Charter dan Project Scope Statement?",
+                category: "Week 5: Charter vs Scope Statement",
+                options: [
+                    { text: "Project Charter berisi ringkasan tingkat tinggi (high-level), sedangkan Project Scope Statement berisi penjabaran detail ruang lingkup proyek.", isCorrect: true, rationale: "Scope statement jauh lebih detail menguraikan deliverable, asumsi, batasan, dan exclusion dibanding charter." },
+                    { text: "Project Charter dibuat di akhir proyek, sedangkan Scope Statement dibuat di awal sebelum kontrak ditandatangani.", isCorrect: false, rationale: "Pernyataan ini terbalik; charter dibuat di awal otorisasi proyek." },
+                    { text: "Project Charter hanya untuk proyek konstruksi, sedangkan Scope Statement untuk software.", isCorrect: false, rationale: "Keduanya digunakan di berbagai jenis industri manajemen proyek." },
+                    { text: "Tidak ada perbedaan isi antara charter dan scope statement.", isCorrect: false, rationale: "Tingkat kedalaman informasi keduanya sangat berbeda." }
+                ],
+                hint: "Charter bersifat high-level, sedangkan Scope Statement menguraikannya secara lebih detail."
+            },
+            {
+                question: "Manakah teknik Extreme Programming (XP) di mana dua programmer bekerja bersama pada satu komputer yang sama (satu mengetik, satu meninjau)?",
+                category: "Week 4: XP Practices",
+                options: [
+                    { text: "Pair Programming", isCorrect: true, rationale: "Pair programming meningkatkan kualitas kode, transfer pengetahuan, dan review langsung." },
+                    { text: "Solo Coding", isCorrect: false, rationale: "Solo coding dikerjakan sendiri-sendiri." },
+                    { text: "Remote Isolation", isCorrect: false, rationale: "Bukan praktik XP." },
+                    { text: "Waterfall Coding", isCorrect: false, rationale: "Waterfall bukan teknik XP." }
+                ],
+                hint: "Praktik dua orang programmer dalam satu stasiun kerja."
+            },
+            {
+                question: "Apa arti dari prinsip 'Fail fast with learning' dalam mindset Agile?",
+                category: "Week 4: Agile Mindset",
+                options: [
+                    { text: "Segera mendeteksi kesalahan atau ketidakcocokan produk melalui pengiriman iteratif awal agar dapat segera diperbaiki.", isCorrect: true, rationale: "Gagal cepat dalam iterasi kecil jauh lebih baik daripada menyadari kegagalan di akhir proyek besar." },
+                    { text: "Sengaja merusak sistem agar perusahaan mengalami kerugian besar.", isCorrect: false, rationale: "Bukan kesengajaan merusak sistem." },
+                    { text: "Memecat seluruh anggota tim jika terlambat 1 menit menyelesaikan tugas.", isCorrect: false, rationale: "Agile menjunjung tinggi kolaborasi dan keamanan psikologis tim." },
+                    { text: "Menghentikan semua proyek IT selamanya.", isCorrect: false, rationale: "Bukan penghentian aktivitas IT." }
+                ],
+                hint: "Belajar dari kesalahan kecil lewat iterasi cepat sebelum terlambat."
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let answered = false;
+
+        const welcomeScreen = document.getElementById('welcome-screen');
+        const quizScreen = document.getElementById('quiz-screen');
+        const resultScreen = document.getElementById('result-screen');
+        const scoreBadge = document.getElementById('score-badge');
+        
+        const qNumEl = document.getElementById('question-number');
+        const qCatEl = document.getElementById('question-category');
+        const progressBar = document.getElementById('progress-bar');
+        const qTextEl = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const explanationBox = document.getElementById('explanation-box');
+        const explanationText = document.getElementById('explanation-text');
+        const nextBtn = document.getElementById('next-btn');
+
+        const currentScoreEl = document.getElementById('current-score');
+        const totalScoreEl = document.getElementById('total-score');
+        const finalScoreEl = document.getElementById('final-score');
+        const resultMessageEl = document.getElementById('result-message');
+
+        totalScoreEl.textContent = quizData.length;
+
+        function startQuiz() {
+            welcomeScreen.classList.add('hidden');
+            quizScreen.classList.remove('hidden');
+            scoreBadge.classList.remove('hidden');
+            currentQuestionIndex = 0;
+            score = 0;
+            currentScoreEl.textContent = score;
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            answered = false;
+            explanationBox.classList.add('hidden');
+            nextBtn.classList.add('hidden');
+
+            const currentQ = quizData[currentQuestionIndex];
+            qNumEl.textContent = currentQuestionIndex + 1;
+            qCatEl.textContent = currentQ.category;
+            qTextEl.textContent = currentQ.question;
+
+            // Progress Bar update
+            const progress = ((currentQuestionIndex) / quizData.length) * 100;
+            progressBar.style.width = `${progress}%`;
+
+            optionsContainer.innerHTML = '';
+            
+            // Randomize options for streaming experience simulation
+            const shuffledOptions = [...currentQ.options].sort(() => Math.random() - 0.5);
+
+            shuffledOptions.forEach((option) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left p-4 rounded-xl border border-slate-700 bg-slate-900/40 hover:bg-slate-700/50 hover:border-indigo-500 text-slate-200 font-medium transition-all duration-200 flex items-center justify-between cursor-pointer";
+                btn.innerHTML = `<span>${option.text}</span>`;
+                btn.onclick = () => selectOption(option, btn, shuffledOptions);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function selectOption(selectedOption, selectedBtn, allOptions) {
+            if (answered) return;
+            answered = true;
+
+            const buttons = optionsContainer.getElementsByTagName('button');
+
+            if (selectedOption.isCorrect) {
+                score++;
+                currentScoreEl.textContent = score;
+                selectedBtn.classList.remove('bg-slate-900/40', 'border-slate-700', 'hover:bg-slate-700/50', 'hover:border-indigo-500');
+                selectedBtn.classList.add('bg-emerald-500/20', 'border-emerald-500', 'text-emerald-200');
+            } else {
+                selectedBtn.classList.remove('bg-slate-900/40', 'border-slate-700', 'hover:bg-slate-700/50', 'hover:border-indigo-500');
+                selectedBtn.classList.add('bg-rose-500/20', 'border-rose-500', 'text-rose-200');
+
+                // Highlight correct option
+                Array.from(buttons).forEach((b) => {
+                    const optText = b.querySelector('span').textContent;
+                    const matched = allOptions.find(o => o.text === optText);
+                    if (matched && matched.isCorrect) {
+                        b.classList.remove('bg-slate-900/40', 'border-slate-700', 'hover:bg-slate-700/50', 'hover:border-indigo-500');
+                        b.classList.add('bg-emerald-500/20', 'border-emerald-500', 'text-emerald-200');
+                    }
+                });
+            }
+
+            // Disable all buttons
+            Array.from(buttons).forEach(b => b.disabled = true);
+
+            // Show explanation
+            explanationText.textContent = selectedOption.rationale;
+            explanationBox.classList.remove('hidden');
+
+            // Show next button
+            nextBtn.classList.remove('hidden');
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < quizData.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            quizScreen.classList.add('hidden');
+            scoreBadge.classList.add('hidden');
+            resultScreen.classList.remove('hidden');
+
+            progressBar.style.width = `100%`;
+            finalScoreEl.textContent = score;
+
+            const percentage = (score / quizData.length) * 100;
+            let message = "";
+            if (percentage >= 85) {
+                message = "Luar biasa! Pemahaman Anda mengenai Software Project Management sangat matang dan siap menghadapi ujian.";
+            } else if (percentage >= 70) {
+                message = "Bagus sekali! Anda memiliki penguasaan materi yang baik, namun beberapa bagian masih bisa ditinjau ulang.";
+            } else {
+                message = "Terus semangat belajar! Silakan pelajari kembali modul materi Week 1 sampai Week 7 untuk memperkuat pemahaman Anda.";
+            }
+            resultMessageEl.textContent = message;
+        }
+
+        function restartQuiz() {
+            resultScreen.classList.add('hidden');
+            welcomeScreen.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
+```eof
+
+Saya telah berhasil membuat aplikasi **Kuis Interaktif Software Project Management** berisi 50 pertanyaan lengkap yang bersumber dari materi kuliah Anda (Week 1 sampai Week 7). Kuis ini dikemas dalam satu file web modern yang interaktif, lengkap dengan pilihan ganda acak, pembahasan (rationale) di setiap soal, pelacakan skor real-time, serta tampilan responsif menggunakan Tailwind CSS.
+
+Semoga kuis interaktif ini dapat membantu Anda mempersiapkan diri dan menguasai materi dengan sangat baik. Tetap semangat belajarnya, *you've got this!*
